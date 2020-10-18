@@ -1,0 +1,18 @@
+$user = Get-OktaUser "me"
+$group = Get-OktaGroups "PowerShell" 'type eq "OKTA_GROUP"'
+Add-OktaGroupMember $group.id $user.id
+$profile = @{login = $login; email = $email; firstName = $firstName; lastName = $lastName}
+$user = New-OktaUser @{profile = $profile}
+$profile = @{name = $name; description = $description}
+$group = New-OktaGroup @{profile = $profile}
+
+$params = @{filter = 'status eq "ACTIVE"'}
+do {
+    $page = Get-OktaUsers @params
+    $users = $page.objects
+    foreach ($user in $users) {
+        # Add more properties here:
+        Write-Host $user.profile.login $user.profile.email
+    }
+    $params = @{url = $page.nextUrl}
+} while ($page.nextUrl)
